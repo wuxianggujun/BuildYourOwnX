@@ -1,5 +1,7 @@
 #include "Statement.hpp"
 #include <cstring>
+#include "BTree.hpp"
+#include "Cursor.hpp"
 #include <iostream>
 
 Statement::Statement(): type(StatementType::STATEMENT_SELECT), rowToInsert() {
@@ -59,9 +61,15 @@ PrepareResult Statement::prepareInsert(InputBuffer &input_buffer) {
 
 ExecuteResult Statement::executeInsert(Table &table) {
     if (table.isFull()) {
+        std::cerr << "Error: Table full." << std::endl;
         return ExecuteResult::EXECUTE_TABLE_FULL;
     }
-    table.insert(rowToInsert);
+    auto* cursor = 
+new Cursor(&table, table.getRootPageNum(), *leaf_node_num_cells(table.getPager().getPage(table.getRootPageNum())));
+    leaf_node_insert(cursor, rowToInsert.id, &rowToInsert);
+    delete cursor;
+
+    printf("Executed.\n");
     return ExecuteResult::EXECUTE_SUCCESS;
 }
 

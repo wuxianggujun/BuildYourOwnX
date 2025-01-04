@@ -11,20 +11,14 @@ set(CMAKE_PREFIX_PATH "D:/Programs/vcpkg/installed/x64-windows")
 find_package(GTest CONFIG REQUIRED)
 
 set(SRC_FILES
-        src/Pager.hpp
+        src/BTree.cpp
+        src/Cursor.cpp
         src/Pager.cpp
-        src/Common.hpp
-        src/Row.hpp
         src/Row.cpp
-        src/Table.hpp
         src/Table.cpp
-        src/Statement.hpp
         src/Statement.cpp
-        src/MetaCommand.hpp
         src/MetaCommand.cpp
-        src/Database.hpp
         src/Database.cpp
-        src/InputBuffer.hpp
         src/InputBuffer.cpp
         src/main.cpp
 )

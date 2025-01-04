@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
+#include <ostream>
 #include <string>
 #include "InputBuffer.hpp"
 
@@ -19,6 +21,8 @@ enum class MetaCommandResult {
 
 enum class PrepareResult {
     PREPARE_SUCCESS,
+    PREPARE_NEGATIVE_ID,
+    PREPARE_STRING_TOO_LONG,
     PREPARE_SYNTAX_ERROR,
     PREPARE_UNRECOGNIZED_STATEMENT
 };
@@ -34,8 +38,8 @@ enum class StatementType {
 class Row {
 public:
     uint32_t id;
-    char username[COLUMN_USERNAME_SIZE];
-    char email[COLUMN_EMAIL_SIZE];
+    char username[COLUMN_USERNAME_SIZE + 1];
+    char email[COLUMN_EMAIL_SIZE + 1];
 
     void print() const {
         printf("(%u, %s, %s)\n", id, username, email);
@@ -116,18 +120,41 @@ MetaCommandResult do_meta_command(const InputBuffer &input_buffer) {
     return MetaCommandResult::META_COMMAND_UNRECOGNIZED_COMMAND;
 }
 
+PrepareResult prepare_insert(InputBuffer *input_buffer, Statement *statement) {
+    statement->type = StatementType::STATEMENT_INSERT;
+
+    char *keyword = strtok(const_cast<char *>(input_buffer->getBuffer()), " ");
+    char *id_string = strtok(nullptr, " ");
+    char *username = strtok(nullptr, " ");
+    char *email = strtok(nullptr, " ");
+
+    if (id_string == nullptr || username == nullptr || email == nullptr) {
+        return PrepareResult::PREPARE_SYNTAX_ERROR;
+    }
+
+    int id = atoi(id_string);
+    if (id < 0) {
+        return PrepareResult::PREPARE_NEGATIVE_ID;
+    }
+
+    if (strlen(username) > COLUMN_USERNAME_SIZE) {
+        return PrepareResult::PREPARE_STRING_TOO_LONG;
+    }
+
+    if (strlen(email) > COLUMN_EMAIL_SIZE) {
+        return PrepareResult::PREPARE_STRING_TOO_LONG;
+    }
+
+    statement->row_to_insert.id = id;
+    strcpy(statement->row_to_insert.username, username);
+    strcpy(statement->row_to_insert.email, email);
+    return PrepareResult::PREPARE_SUCCESS;
+}
+
+
 PrepareResult prepare_statement(const InputBuffer &input_buffer, Statement &statement) {
     if (strncmp(input_buffer.getBuffer(), "insert", 6) == 0) {
-        statement.type = StatementType::STATEMENT_INSERT;
-
-        int args_assigned = sscanf(input_buffer.getBuffer(), "insert %d %s %s",
-                                   &statement.row_to_insert.id, statement.row_to_insert.username,
-                                   statement.row_to_insert.email);
-
-        if (args_assigned < 3) {
-            return PrepareResult::PREPARE_SYNTAX_ERROR;
-        }
-        return PrepareResult::PREPARE_SUCCESS;
+        return prepare_insert(const_cast<InputBuffer *>(&input_buffer), &statement);
     }
     if (strncmp(input_buffer.getBuffer(), "select", 6) == 0) {
         statement.type = StatementType::STATEMENT_SELECT;
@@ -168,10 +195,35 @@ ExecuteResult execute_statement(Statement &statement, Table &table) {
     return ExecuteResult::EXECUTE_SUCCESS;
 }
 
+void insert_many_rows(Table &table) {
+    for (uint32_t i = 1; i <= 1400; ++i) {
+        Row row;
+        row.id = i;
+        sprintf(row.username, "user%u", i);
+        sprintf(row.email, "user%u@example.com", i);
+
+        Statement statement;
+        statement.type = StatementType::STATEMENT_INSERT;
+        statement.row_to_insert = row;
+
+        ExecuteResult result = execute_insert(statement, table);
+        if (result == ExecuteResult::EXECUTE_TABLE_FULL) {
+            std::cerr << "Error: Table full." << std::endl;
+            return;
+        }
+    }
+    std::cout << "Inserted 1400 rows successfully." << std::endl;
+}
 
 [[noreturn]] int main(int argc, char *argv[]) {
     Table table;
     InputBuffer input_buffer;
+
+    /*
+    // Call the function to insert 1400 rows
+    insert_many_rows(table);
+*/
+
     while (true) {
         print_prompt();
         input_buffer.readInput();
@@ -190,6 +242,12 @@ ExecuteResult execute_statement(Statement &statement, Table &table) {
         switch (prepare_statement(input_buffer, statement)) {
             case PrepareResult::PREPARE_SUCCESS:
                 break;
+            case PrepareResult::PREPARE_NEGATIVE_ID:
+                printf("ID must be positive.\n");
+                continue;
+            case PrepareResult::PREPARE_STRING_TOO_LONG:
+                printf("String is too long.\n");
+                continue;
             case PrepareResult::PREPARE_SYNTAX_ERROR:
                 printf("Syntax error. Could not parse statement.\n");
                 continue;

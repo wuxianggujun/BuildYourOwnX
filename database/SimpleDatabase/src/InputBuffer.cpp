@@ -56,3 +56,11 @@ void InputBuffer::readInput() {
 
     strcpy(buffer, input_line.c_str());
 }
+
+void InputBuffer::setBuffer(const char *new_buffer) {
+    delete[] buffer; // 释放旧的 buffer
+    buffer_length = strlen(new_buffer) + 1;
+    buffer = new char[buffer_length];
+    strcpy(buffer, new_buffer);
+    input_length = strlen(new_buffer); //更新input_length
+}

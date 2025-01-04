@@ -14,6 +14,7 @@ public:
     void setInputLength(int input_length);
 
     void readInput();
+    void setBuffer(const char* buffer);
 private:
     char* buffer;
     size_t buffer_length;

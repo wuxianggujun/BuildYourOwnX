@@ -1,27 +1,46 @@
 #pragma once
+#include <cstdint>
 
-#include "Table.hpp"
+class Table;
+class Row;
 
 class Cursor {
 public:
-	explicit Cursor(Table* table, uint32_t page_num,uint32_t cell_num);
-	~Cursor();
+    explicit Cursor(Table *table, uint32_t pageNum, uint32_t cellNum, bool endOfTable): table_(table),
+        pageNUm_(pageNum), cellNum_(cellNum), endOfTable_(endOfTable) {
+    }
 
+    explicit Cursor(Table *table, uint32_t key): table_(table), pageNUm_(0), cellNum_(0), endOfTable_(false) {
+        find(key);
+    }
 
-	void* value();
-	void advance();
-	bool isEndOfTable() const;
+    [[nodiscard]] Row *getValue() const;
 
-	void setCellNum(uint32_t cell_num);
-	
-	uint32_t getPageNum() const;
-	uint32_t getCellNum() const;
+    void advance();
 
-	friend void leaf_node_insert(Cursor* cursor,uint32_t key,Row* value);
+    void find(uint32_t key);
+
+    void setCellNum(uint32_t num);
+
+    void setEndOfTable(bool endOfTable);
+
+    void setPageNUm(uint32_t pageNum);
+
+    uint32_t getPageNUm() {
+        return pageNUm_;
+    }
+
+    uint32_t getCellNum() {
+        return cellNum_;
+    }
+
+    bool isEndOfTable() {
+        return endOfTable_;
+    }
 
 private:
-	Table* table;
-	uint32_t page_num;
-	uint32_t cell_num;
-	bool end_of_table;
+    Table *table_;
+    uint32_t pageNUm_;
+    uint32_t cellNum_;
+    bool endOfTable_;
 };

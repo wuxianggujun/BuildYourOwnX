@@ -1,8 +1,5 @@
 # 测试程序
 set(TEST_SRC_FILES
-        Compiler.hpp
-        Compiler.cpp
-        test.cpp
         
 )
 

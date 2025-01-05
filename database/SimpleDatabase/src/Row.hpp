@@ -1,28 +1,43 @@
 #pragma once
 
-#include <cstdint>
-#include <cstring>
-#include <iostream>
-#include "Common.hpp"
-
 class Row {
 public:
+    Row(): id(0) {
+    }
+
+    explicit Row(uint32_t id, const std::string &username, const std::string &email): id(id), username(username),
+        email(email) {
+        if (username.length() > COLUMN_USERNAME_SIZE) {
+            throw std::runtime_error("Username too long.");
+        }
+        if (email.length() > COLUMN_EMAIL_SIZE) {
+            throw std::runtime_error("Email too long.");
+        }
+    }
+
+    std::string getUserName() const {
+        return username;
+    }
+    std::string getEmail() const {
+        return email;
+    }
+    uint32_t getId() const {
+        return id;
+    }
+
+    void setId(uint32_t id) {
+        this->id = id;
+    }
+
+    void setUsername(std::string username) {
+        this->username = username;
+    }
+
+    void setEmail(std::string email) {
+        this->email = email;
+    }
+private:
     uint32_t id;
-    char username[COLUMN_USERNAME_SIZE + 1];
-    char email[COLUMN_EMAIL_SIZE + 1];
-
-    void print() const;
-
-    void serialize(void *destination) const;
-
-    void deserialize(void *source);
+    std::string username;
+    std::string email;
 };
-
-// Declare the functions to calculate sizes and offsets
-uint32_t calculateIdSize();
-uint32_t calculateUsernameSize();
-uint32_t calculateEmailSize();
-uint32_t calculateIdOffset();
-uint32_t calculateUsernameOffset();
-uint32_t calculateEmailOffset();
-uint32_t calculateRowSize();

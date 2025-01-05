@@ -1,31 +1,29 @@
 #pragma once
+#include <string>
 
-#include "Pager.hpp"
-#include "Row.hpp"
-#include "Common.hpp"
-
+class Pager;
 class Cursor;
 
 class Table {
 public:
-    explicit Table(const std::string& filename);
+    explicit Table(const std::string &filename);
+
     ~Table();
 
-    void close();
-    bool isFull() const;
-    void insert(const Row& row);
-    void select();
+    Cursor *tableStart();
 
-    uint32_t getRootPageNum() const;
+    void close() const;
+
+    Pager* getPager() const {
+        return pager_;
+    }
     
     friend class Cursor;
-    Pager& getPager();
+    friend class Pager;
+    friend class InternalNode;
+    friend class LeafNode;
 
-    Cursor* table_start(Table* table);
-    Cursor* table_find(Table* table, uint32_t key);
-    
 private:
-    Pager pager;
-    uint32_t root_page_num;
-    uint32_t getLeafNodeMaxCells() const;
+    Pager *pager_;
+    uint32_t rootPageNum_;
 };

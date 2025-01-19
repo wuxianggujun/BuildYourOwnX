@@ -5,17 +5,13 @@
 
 class InternalNode : public Node {
 public:
-    InternalNode(): Node(new InternalNodeHeader()) {
-    }
 
-    [[nodiscard]] InternalNodeHeader *getHeader() {
+    InternalNode::InternalNode(Pager* pager, uint32_t pageNum) : Node(new InternalNodeHeader()), pager_(pager), pageNum_(pageNum) {}
+
+    [[nodiscard]] InternalNodeHeader *getHeader() override {
         return dynamic_cast<InternalNodeHeader *>(Node::getHeader());
     }
-
-    [[nodiscard]] const InternalNodeHeader *getHeader() const {
-        return dynamic_cast<const InternalNodeHeader *>(Node::getHeader());
-    }
-
+    
     uint32_t getChildPageNum(Pager *pager, uint32_t index);
 
     void setChildPageNum(uint32_t index, uint32_t childPageNum);
@@ -25,7 +21,11 @@ public:
     
     uint32_t findChildIndex(uint32_t key);
 
-    ~InternalNode() override = default;
+    ~InternalNode() = default;
+private:
+    Pager* pager_;
+    uint32_t pageNum_;
+
 public:
     static constexpr uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
     static constexpr uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE = sizeof(uint32_t);
@@ -46,5 +46,6 @@ public:
             COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE + INTERNAL_NODE_RIGHT_CHILD_SIZE;
 
     static constexpr uint32_t INTERNAL_NODE_CELL_OFFSET = INTERNAL_NODE_HEADER_SIZE;
+
 };
 

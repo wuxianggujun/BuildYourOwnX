@@ -1,4 +1,7 @@
 #include "Cursor.hpp"
+
+#include <iostream>
+
 #include "Node.hpp"
 #include "LeafNode.hpp"
 #include "InternalNode.hpp"
@@ -36,13 +39,23 @@ void Cursor::find(uint32_t key) {
     uint32_t root_page_num = table_->rootPageNum_;
     Node *root_node = table_->pager_->getPage(root_page_num);
 
+    if (root_node == nullptr) {
+        std::cerr << "Error: Root node not found!" << std::endl;
+        endOfTable_ = true; // 或其他适当的操作
+        return; // 退出 find 函数
+    }
+    
     if (root_node->getHeader()->getType() == NodeType::LEAF) {
-        LeafNode *leaf_node = dynamic_cast<LeafNode *>(root_node);
+        std::cerr << "root_node address in Cursor::find: " << root_node << std::endl;
+        std::cerr << "root_node header address in Cursor::find: " << root_node->getHeader() << std::endl;
+        auto *leaf_node = dynamic_cast<LeafNode *>(root_node);
+        std::cerr << "leaf_node address after dynamic_cast: " << leaf_node << std::endl;
+
         pageNUm_ = root_page_num;
         cellNum_ = leaf_node->findCellIndex(key);
         endOfTable_ = false;
     } else {
-        InternalNode *internal_node = dynamic_cast<InternalNode *>(root_node);
+        auto *internal_node = dynamic_cast<InternalNode *>(root_node);
         uint32_t child_index = internal_node->findChildIndex(key);
         uint32_t child_page_num = internal_node->getChildPageNum(table_->pager_, child_index);
         Node *child_node = table_->pager_->getPage(child_page_num);
@@ -54,7 +67,7 @@ void Cursor::find(uint32_t key) {
             child_node = table_->pager_->getPage(child_page_num);
         }
 
-        LeafNode *leaf_node = dynamic_cast<LeafNode *>(child_node);
+        auto *leaf_node = dynamic_cast<LeafNode *>(child_node);
         pageNUm_ = child_page_num;
         cellNum_ = leaf_node->findCellIndex(key);
         endOfTable_ = false;

@@ -7,11 +7,22 @@ class Row;
 
 class LeafNode : public Node {
 public:
-    LeafNode() : Node(new LeafNodeHeader()) {}
 
-    LeafNodeHeader* getHeader() { return dynamic_cast<LeafNodeHeader*>(Node::getHeader()); }
-    [[nodiscard]] const LeafNodeHeader* getHeader() const { return dynamic_cast<const LeafNodeHeader*>(Node::getHeader()); }
+    LeafNode::LeafNode(Pager* pager, uint32_t pageNum) : Node(new LeafNodeHeader()), pager_(pager), pageNum_(pageNum) {}
+    LeafNodeHeader* getHeader() override
+    {
+        auto* header = dynamic_cast<LeafNodeHeader*>(Node::getHeader());
+        if (header == nullptr) {
+            // Handle the error: dynamic_cast failed.
+            std::cerr << "Error: dynamic_cast failed in LeafNode::getHeader" << std::endl;
+            // You might want to throw an exception, return nullptr, or handle it in some other way.
+            return nullptr;
+        }
 
+    	return header;
+    }
+
+    void* getCell(uint32_t cell_num);
     // Methods for accessing keys and values
     [[nodiscard]] uint32_t getKey(uint32_t cell_num) ;
     Row* getValue(Pager* pager, uint32_t cell_num);
@@ -20,7 +31,9 @@ public:
     [[nodiscard]] uint32_t findCellIndex(uint32_t key);
 
     void insertAt(uint32_t cell_num, uint32_t key, const Row& value);
-
+private:
+    Pager* pager_;
+	uint32_t pageNum_;
 public:
     static constexpr uint32_t LEAF_NODE_NUM_CELLS_SIZE = sizeof(uint32_t);
     static constexpr uint32_t LEAF_NODE_NEXT_LEAF_SIZE = sizeof(uint32_t);

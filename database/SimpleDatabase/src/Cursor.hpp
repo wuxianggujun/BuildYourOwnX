@@ -10,7 +10,7 @@ public:
         pageNUm_(pageNum), cellNum_(cellNum), endOfTable_(endOfTable) {
     }
 
-    explicit Cursor(Table *table, uint32_t key): table_(table), pageNUm_(0), cellNum_(0), endOfTable_(false) {
+    explicit Cursor(Table *table, const uint32_t key): table_(table), pageNUm_(0), cellNum_(0), endOfTable_(false) {
         find(key);
     }
 

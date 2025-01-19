@@ -3,5 +3,12 @@ project(BuildYourOwnX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(emulator/LinuxCntr500)
-add_subdirectory(database/SimpleDatabase)
+add_subdirectory(game/Cavestory)
+#add_subdirectory(emulator/LinuxCntr500)
+#add_subdirectory(database/SimpleDatabase)
+
+#[[
+add_compile_options(-fsanitize=address)
+add_compile_options(-fno-omit-frame-pointer)
+add_link_options(-fsanitize=address)
+add_link_options(-fno-omit-frame-pointer)]]

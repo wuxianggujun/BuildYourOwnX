@@ -6,5 +6,5 @@
 /.vs
 /out/build
 /cmake-build-debug
-/CMakeSettings.json
 CMakeSettings.json
+/out/

@@ -3,7 +3,8 @@ project(BuildYourOwnX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_subdirectory(game/Cavestory)
+#add_subdirectory(game/Cavestory)
+add_subdirectory(mark-sweep)
 #add_subdirectory(emulator/LinuxCntr500)
 #add_subdirectory(database/SimpleDatabase)
 

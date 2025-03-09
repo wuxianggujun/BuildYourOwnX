@@ -1,5 +1,6 @@
 //
 // Created by wuxianggujun on 2025/1/19.
+// https://journal.stuffwithstuff.com/2013/12/08/babys-first-garbage-collector/
 //
 
 #include <cstdio>

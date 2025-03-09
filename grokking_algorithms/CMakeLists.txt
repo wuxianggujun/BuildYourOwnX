@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 3.15)
+project(grokking_algorithms)
+
+add_subdirectory(01_introduction_to_algorithms)

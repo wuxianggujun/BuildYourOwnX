@@ -2,3 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(grokking_algorithms)
 
 add_subdirectory(01_introduction_to_algorithms)
+add_subdirectory(02_selection_sort)
+add_subdirectory(03_recursion)
+add_subdirectory(04_quicksort)
+add_subdirectory(05_hash_tables)

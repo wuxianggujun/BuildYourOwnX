@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD 20)
 #add_subdirectory(database/SimpleDatabase)
 #add_subdirectory(grokking_algorithms)
 
-#add_subdirectory(OpenGL-for-Beginners)
+add_subdirectory(OpenGL-for-Beginners)
 
-add_subdirectory(AesTest)
+#add_subdirectory(AesTest)
 
 #[[
 add_compile_options(-fsanitize=address)
